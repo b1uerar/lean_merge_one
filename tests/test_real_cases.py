@@ -1,4 +1,4 @@
-"""Real timeout regressions; set LEAN_MERGE_TEST_PROJECT to a built Mathlib project."""
+"""Real merge regressions; set LEAN_MERGE_TEST_PROJECT to a built Mathlib project."""
 
 import hashlib
 import json
@@ -97,7 +97,7 @@ class RealMergeTests(unittest.TestCase):
         self.assertLessEqual(metadata["output_bytes"], limit)
 
         # Check every accepted target again in a fresh Lean process, including earlier merges.
-        targets = (*previous_targets, target)
+        targets = (*case.get("preserved_targets", ()), *previous_targets, target)
         names = ", ".join("`" + name for name in targets)
         checks = "\nrun_cmd do\n  for name in #[" + names + "] do\n" + '''    let bad := (<- Lean.collectAxioms name).filter fun ax =>
       !(#[`propext, `Quot.sound, `Classical.choice] : Array Lean.Name).contains ax
@@ -125,6 +125,15 @@ class RealMergeTests(unittest.TestCase):
 
     def test_brualdi_ch1_5(self):
         self.check_case("brualdi_ch1_5")
+
+    def test_archived_open_nat_context(self):
+        self.check_case("archived_open_nat_context")
+
+    def test_archived_aux_proof_cache(self):
+        self.check_case("archived_aux_proof_cache")
+
+    def test_archived_aux_simp_cache(self):
+        self.check_case("archived_aux_simp_cache")
 
     def test_egmo_card_blackCell_eq_card_whiteCell(self):
         self.check_case("egmo_card_colours")

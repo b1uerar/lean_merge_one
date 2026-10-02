@@ -387,11 +387,18 @@ def checkImportEffects (before after : Document) (target : Option Name := none) 
     let mut mapping : NameMap Name := {}
     for (name, _) in before.owners.toArray do
       if let some current := existingName? after.env name then mapping := mapping.insert name current
+    let cachedProofs := (auxLemmasExt.getState before.env).lemmas.toList.foldl
+      (fun (names : NameSet) (_, value) => names.insert value.1) {}
     let mut beforeState : CollectAxioms.State := {}
     let mut afterState : CollectAxioms.State := {}
     for (name, _) in before.owners.toArray do
       if replaced.contains name then continue
       let some old := before.env.find? name | throwError "Missing original declaration: {name}"
+      -- mkAuxLemma caches by type. Moving a proof can warm this cache earlier and
+      -- change which proposition a later _proof/_simp number names. Check these
+      -- proofs through their users, not by matching their unstable generated names.
+      if isTheorem old && cachedProofs.contains name &&
+          (declRangeExt.find? before.env name).isNone then continue
       if (existingName? after.env name).isNone && (privateToUserName name).isInternalDetail then
         continue
       let some current := mapping.find? name | throwError "{stage} removed a declaration: {name}"
@@ -622,7 +629,9 @@ def arrange (base donor : Document) (target candidate : Name) (selection : Selec
     rest := rest ++ slice base.source cursor start
     if i == targetOwner then
       if !lifted.selected.contains i then rest := rest ++ remainingOwner
-    else if lifted.selected.contains i && !isScopeCommand cmd.stx then pure ()
+    -- Context commands also govern declarations left at their original positions.
+    else if lifted.selected.contains i && !isScopeCommand cmd.stx &&
+        !isContextCommand cmd.stx then pure ()
     else rest := rest ++ slice base.source start stop
     cursor := stop
   rest := rest ++ slice base.source cursor base.source.rawEndPos

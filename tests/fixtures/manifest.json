@@ -32,6 +32,36 @@
       "bytes": 7291,
       "sha256": "84c92d02e499e853fc4f8dafc19b327421f49810ad4f995b035f03501d6fb260",
       "source": "round-001/items/egmo_2022_p5_sol-38f3ddf897a674f1/proof/calls/r000012-n002-prove/result.json#submitted_source"
+    },
+    "failure_regressions/open_nat_context/Base.lean": {
+      "bytes": 1449,
+      "sha256": "76ec75c451667332c3afdcd87f69e0701f48488448101acd76c158a3b8196480",
+      "source": "failures/20260929T115340.039860Z-jux1h58j/base.lean"
+    },
+    "failure_regressions/open_nat_context/Donor.lean": {
+      "bytes": 5317,
+      "sha256": "1a63aaf238cb2144cf96f0d7600fdd8aee2a947e7baa7aa551a2adedc2e71704",
+      "source": "failures/20260929T115340.039860Z-jux1h58j/donor.lean"
+    },
+    "failure_regressions/aux_proof_cache/Base.lean": {
+      "bytes": 7428,
+      "sha256": "43c0bd813e6b1b3ee467ce8ea52add2bfc08eafeac3cd930173ab5bb77b008f1",
+      "source": "failures/20260929T131844.977391Z-cw_fot17/base.lean"
+    },
+    "failure_regressions/aux_proof_cache/Donor.lean": {
+      "bytes": 8721,
+      "sha256": "7ca8953e1585b516179f20f7c53bb409953bb2abc1a491552743bab55abe6b98",
+      "source": "failures/20260929T131844.977391Z-cw_fot17/donor.lean"
+    },
+    "failure_regressions/aux_simp_cache/Base.lean": {
+      "bytes": 27301,
+      "sha256": "53f5e304722a59565dd11eac25efdfb5f341751ff6dc40feaa66a1cc15f718df",
+      "source": "failures/20261001T174300.618116Z-e4xyj5ea/base.lean"
+    },
+    "failure_regressions/aux_simp_cache/Donor.lean": {
+      "bytes": 14618,
+      "sha256": "d39cc30332bc27deae5f3fecbf651ecb29e256e343080543ac286880028d3067",
+      "source": "failures/20261001T174300.618116Z-e4xyj5ea/donor.lean"
     }
   },
   "cases": {
@@ -58,6 +88,40 @@
       "donor": "egmo_2022_p5/CharpolyPath.lean",
       "target": "charpoly_pathAdj",
       "max_output_bytes": 22567
+    },
+    "archived_open_nat_context": {
+      "base": "failure_regressions/open_nat_context/Base.lean",
+      "donor": "failure_regressions/open_nat_context/Donor.lean",
+      "target": "sum_perm_f_dvd_factorial",
+      "max_output_bytes": 10862,
+      "source_failure": "20260929T115340.039860Z-jux1h58j",
+      "regression": "Keep open Nat in the original scope when moving dependencies.",
+      "error_before_fix": "LeanMergeBase.lean:142:54: error: unexpected token ')'; expected term\n\nlean-merge: No compatible complete proof found.\nsum_perm_f_dvd_factorial: Lean elaboration failed",
+      "preserved_targets": []
+    },
+    "archived_aux_proof_cache": {
+      "base": "failure_regressions/aux_proof_cache/Base.lean",
+      "donor": "failure_regressions/aux_proof_cache/Donor.lean",
+      "target": "occurs_infinitely_iff_infinitely_many_values_occur_m_times",
+      "max_output_bytes": 20245,
+      "source_failure": "20260929T131844.977391Z-cw_fot17",
+      "regression": "Auxiliary _proof numbers can refer to different types after moving a proof.",
+      "error_before_fix": "lean-merge: No compatible complete proof found.\noccurs_infinitely_iff_infinitely_many_values_occur_m_times: Merge changed the type of one_occurs_infinitely_often._proof_6",
+      "preserved_targets": [
+        "one_occurs_infinitely_often"
+      ]
+    },
+    "archived_aux_simp_cache": {
+      "base": "failure_regressions/aux_simp_cache/Base.lean",
+      "donor": "failure_regressions/aux_simp_cache/Donor.lean",
+      "target": "clean_interval_forces_two_large_elements",
+      "max_output_bytes": 46015,
+      "source_failure": "20261001T174300.618116Z-e4xyj5ea",
+      "regression": "Auxiliary _simp numbers can refer to different types after moving a proof.",
+      "error_before_fix": "lean-merge: No compatible complete proof found.\nclean_interval_forces_two_large_elements: Merge changed the type of odd_subset_count_lt_total_of_injective._simp_2",
+      "preserved_targets": [
+        "odd_subset_count_lt_total_of_injective"
+      ]
     }
   },
   "egmo_sequence": [

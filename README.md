@@ -83,7 +83,7 @@ LEAN_MERGE_TEST_PROJECT=/path/to/project \
   python3 -m unittest discover -s tests -p test_real_cases.py -v
 ```
 
-真实案例包含 Brualdi、EGMO 的三份证明及连续合并，检查输出规模、完整源码编译和公理依赖。
+真实案例包含 Brualdi、EGMO 的三份证明及连续合并，以及从失败归档保留的三个回归案例，检查输出规模、完整源码编译和公理依赖。
 
 ## 失败记录
 
@@ -92,3 +92,27 @@ Python 命令行或 API 执行失败时，会在本工具目录的 `failures/` �
 成功时不创建记录。失败记录不会覆盖输入或已有输出，已加入 Git 忽略规则，可在修复后手动删除。归档写入失败时只打印提示，仍返回原始错误。AgentProver 的沙箱调用由宿主进程在同一位置保存记录；直接使用 `lean --run` 运行内部 Lean 文件不经过 Python 归档入口。
 
 设置 `LEAN_TOOL_FAILURE_ARCHIVE=0` 可关闭失败归档。测试套件自动设置此开关，避免预期失败写入工具目录；归档功能的专用测试仅在临时目录中启用归档。
+
+### 2026-10-02 失败排查
+
+检查了归档 `20260929T115340.039860Z-jux1h58j` 至 `20261002T011149.812817Z-o8cdiykt` 的 33 例失败，确认两个工具缺陷和一例正常的定义冲突。
+
+| 数量 | 失败现象 | 原因与处理 |
+| --- | --- | --- |
+| 26 | `Merge changed the type of ..._proof_*` 或 `..._simp_*` | Lean 按命题缓存辅助证明。前移证明后，缓存命中和辅助声明编号会变化，同编号不再代表同一命题。校验跳过 Lean 辅助证明缓存中无源码声明位置的定理，继续检查使用它们的原有声明和公理依赖。显式声明不按名字前缀豁免。 |
+| 6 | `(m !)` 附近出现 `unexpected token ')'` | 前移依赖时删掉了原位置的 `open Nat`，导致后续声明失去阶乘 notation。现在在原位置保留 `open`、`variable`、`universe`、`include` 等上下文命令。 |
+| 1 | `Source name conflict: candSet` | 主文件通过 `Finset.univ : Finset (Fin m)` 构造集合，提交文件通过 `Finset.range m` 构造集合。两者不满足工具要求的定义等价性，继续拒绝；调用方应沿用主文件定义，或为不同实现改名。 |
+
+修复后逐一回放这 33 份归档，32 例合并并验证成功，只有 `candSet` 一例保留预期的冲突错误。
+
+`tests/test_source_order.py` 包含命名空间、section 参数、辅助证明缓存编号变化的最小回归用例，以及显式内部名字仍须检查的反例。
+
+失败归档按根因去重后，保留以下三组原始输入到 `tests/fixtures/failure_regressions/`，由 `tests/test_real_cases.py` 运行。`tests/fixtures/manifest.json` 记录原归档编号、目标、修复前错误、文件大小及 SHA-256；测试运行不依赖原归档目录或原机器路径。
+
+| 测试目录 | 原归档 | 覆盖问题 |
+| --- | --- | --- |
+| `open_nat_context` | `20260929T115340.039860Z-jux1h58j` | 前移依赖后仍保留原位置的 `open Nat` |
+| `aux_proof_cache` | `20260929T131844.977391Z-cw_fot17` | `_proof_*` 编号变化；原有 `one_occurs_infinitely_often` 仍通过公理检查 |
+| `aux_simp_cache` | `20261001T174300.618116Z-e4xyj5ea` | `_simp_*` 编号变化；原有 `odd_subset_count_lt_total_of_injective` 仍通过公理检查 |
+
+上述样例迁入测试后，清理本批 33 份失败归档，包括同类重复记录和正常的 `candSet` 冲突记录。
