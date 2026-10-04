@@ -1,0 +1,260 @@
+{
+  "tool": "lean_merge",
+  "operation": "merge",
+  "created_at": "2026-10-03T06:57:05.151621+00:00",
+  "cwd": "/home/wwb/codes/agent/AgentProver",
+  "parameters": {
+    "target": "clean_tail_bounds_finite_cutoff",
+    "proof": "clean_tail_bounds_finite_cutoff",
+    "project": "/home/wwb/codes/numina/projects/leanproblems",
+    "timeout": 1200,
+    "use_def_eq": true,
+    "declarations_only": false
+  },
+  "error_type": "CommentDuplication",
+  "error": "Lean verification succeeds, but the merge adds 11 comment occurrences beyond the maximum count in either input.",
+  "exception_raised": false,
+  "verified": true,
+  "copy_errors": {},
+  "files": {
+    "base.lean": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-005/items/imosl_2015_c6_sol-107fb8314fba214c/proof/calls/r000003-n000-explorer/result.json",
+    "donor.lean": "extracted from donor_submitted.lean using LeanDagTools.extract",
+    "donor_submitted.lean": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-005/items/imosl_2015_c6_sol-107fb8314fba214c/proof/calls/r000004-n000-prover/result.json",
+    "candidate.lean": "replayed merge output matching the historical next-task input hash"
+  },
+  "problem": "imosl_2015_c6",
+  "repetition": 5,
+  "run_id": "20261002T162236-1790958156725678901",
+  "merge_target": "clean_tail_bounds_finite_cutoff",
+  "merge_event": {
+    "timestamp": 1790959824.1627328,
+    "event_type": "prerequisite_merged",
+    "payload": {
+      "node": "imosl_2015_c6",
+      "prerequisite": "clean_tail_bounds_finite_cutoff"
+    }
+  },
+  "prefix_merges": [],
+  "historical_output_sha256": "e2f9ce938e68198993de6c7722334c29bef948e780eba61cd32f9a5b24354abe",
+  "matches_historical_output": true,
+  "historical_next_task_request": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-005/items/imosl_2015_c6_sol-107fb8314fba214c/proof/calls/r000005-n000-prover-work/request.json",
+  "historical_next_task_request_sha256": "ede9b7c4110300765207e1efc9f9cc1bfab450397c7faecdf28de5234b2437b0",
+  "source_calls": {
+    "base": "r000003-n000-explorer",
+    "donor": "r000004-n000-prover",
+    "next": "r000005-n000-prover"
+  },
+  "statistics": {
+    "base": {
+      "characters": 6315,
+      "utf8_bytes": 6707,
+      "lines": 170,
+      "blank_lines": 7,
+      "single_line_comments": 11,
+      "distinct_single_line_comments": 11,
+      "duplicate_comment_lines": 0,
+      "sha256": "10c02783aed9b280f9738188af9d571f45dc55ab60c89631f3ce8d7e15012305"
+    },
+    "donor": {
+      "characters": 3290,
+      "utf8_bytes": 3434,
+      "lines": 90,
+      "blank_lines": 10,
+      "single_line_comments": 11,
+      "distinct_single_line_comments": 11,
+      "duplicate_comment_lines": 0,
+      "sha256": "88fa98ad9df688372262cac3fa2c82fa32817b1c86e25da8fb6735dd9aca88c4"
+    },
+    "output": {
+      "characters": 9211,
+      "utf8_bytes": 9693,
+      "lines": 262,
+      "blank_lines": 27,
+      "single_line_comments": 22,
+      "distinct_single_line_comments": 11,
+      "duplicate_comment_lines": 11,
+      "sha256": "e2f9ce938e68198993de6c7722334c29bef948e780eba61cd32f9a5b24354abe"
+    }
+  },
+  "comment_anomalies": [
+    {
+      "comment": "-- In a contradiction argument where all sufficiently large integers are clean,",
+      "base_lines": [
+        7
+      ],
+      "donor_lines": [
+        7
+      ],
+      "output_lines": [
+        15,
+        106
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- this lets us track the unique representation after exchanging one element.",
+      "base_lines": [
+        8
+      ],
+      "donor_lines": [
+        8
+      ],
+      "output_lines": [
+        16,
+        107
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- This proves the finite-set case of the main theorem by bounding every",
+      "base_lines": [
+        49
+      ],
+      "donor_lines": [
+        11
+      ],
+      "output_lines": [
+        19,
+        148
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- possible representation by the sum of all elements of S.",
+      "base_lines": [
+        50
+      ],
+      "donor_lines": [
+        12
+      ],
+      "output_lines": [
+        20,
+        149
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- Appending an element outside both representations converts equal even",
+      "base_lines": [
+        72
+      ],
+      "donor_lines": [
+        15
+      ],
+      "output_lines": [
+        23,
+        171
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- representations into odd ones, where eventual cleanliness forces equality.",
+      "base_lines": [
+        73
+      ],
+      "donor_lines": [
+        16
+      ],
+      "output_lines": [
+        24,
+        172
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- Any representation of a clean number below a cutoff uses only elements",
+      "base_lines": [
+        132
+      ],
+      "donor_lines": [
+        19
+      ],
+      "output_lines": [
+        27,
+        231
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- below that cutoff, which makes finite initial segments control such sums.",
+      "base_lines": [
+        133
+      ],
+      "donor_lines": [
+        20
+      ],
+      "output_lines": [
+        28,
+        232
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- If every integer past N is clean, the clean integers before a cutoff t",
+      "base_lines": [
+        150
+      ],
+      "donor_lines": [
+        23
+      ],
+      "output_lines": [
+        31,
+        249
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- must all be supplied by odd subsets of F; counting those subsets bounds",
+      "base_lines": [
+        151
+      ],
+      "donor_lines": [
+        24
+      ],
+      "output_lines": [
+        32,
+        250
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- how quickly the finite initial segment can grow.",
+      "base_lines": [
+        152
+      ],
+      "donor_lines": [
+        25
+      ],
+      "output_lines": [
+        33,
+        251
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    }
+  ],
+  "excess_comment_lines": 11,
+  "worker_sha256": "c360cb1d4b7cda89032763df58f9d7785f16ea06c3eab8ecfb1207d390eac8cd",
+  "toolchain": "leanprover/lean4:v4.26.0"
+}

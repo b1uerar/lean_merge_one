@@ -1,6 +1,7 @@
 """Real merge regressions; set LEAN_MERGE_TEST_PROJECT to a built Mathlib project."""
 
 import hashlib
+from collections import Counter
 import json
 import os
 from pathlib import Path
@@ -95,6 +96,16 @@ class RealMergeTests(unittest.TestCase):
         self.assertLessEqual(set(result["inserted"]), recorded)
         limit = case["max_output_bytes"] if current is None else MANIFEST["sequence_max_output_bytes"]
         self.assertLessEqual(metadata["output_bytes"], limit)
+        if case.get("check_comment_counts"):
+            def comments(text):
+                return Counter(line.strip() for line in text.splitlines()
+                               if line.lstrip().startswith("--"))
+            base_comments, donor_comments = comments(base), comments(donor)
+            output_comments = comments(content)
+            self.assertFalse(output_comments - (base_comments | donor_comments),
+                             "The merge duplicated declaration comments")
+            self.assertFalse(base_comments - output_comments,
+                             "The merge lost original comments")
 
         # Check every accepted target again in a fresh Lean process, including earlier merges.
         targets = (*case.get("preserved_targets", ()), *previous_targets, target)
@@ -150,6 +161,20 @@ class RealMergeTests(unittest.TestCase):
         for case_id in MANIFEST["egmo_sequence"]:
             current = self.check_case(case_id, current=current, previous_targets=targets)
             targets.append(MANIFEST["cases"][case_id]["target"])
+
+    def test_archived_comment_duplication(self):
+        for problem in ("balticway_2015_p7", "brualdi_ch10_60", "brualdi_ch9_13",
+                        "hackmath_10", "imosl_2015_c6"):
+            with self.subTest(problem=problem):
+                self.check_case("comments_" + problem)
+
+    def test_comments_across_consecutive_merges(self):
+        current = self.check_case("comments_brualdi_ch10_60_prefix")
+        current = self.check_case("comments_brualdi_ch10_60", current=current,
+                                  previous_targets=("offDiagonalOccurrences_card",))
+        comments = [line.strip() for line in current.splitlines() if line.lstrip().startswith("--")]
+        self.assertEqual(len(comments), 4)
+        self.assertEqual(len(set(comments)), 4)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,162 @@
+{
+  "tool": "lean_merge",
+  "operation": "merge",
+  "created_at": "2026-10-03T06:56:52.951064+00:00",
+  "cwd": "/home/wwb/codes/agent/AgentProver",
+  "parameters": {
+    "target": "offDiagonalOccurrences_card_even",
+    "proof": "offDiagonalOccurrences_card_even",
+    "project": "/home/wwb/codes/numina/projects/leanproblems",
+    "timeout": 1200,
+    "use_def_eq": true,
+    "declarations_only": false
+  },
+  "error_type": "CommentDuplication",
+  "error": "Lean verification succeeds, but the merge adds 4 comment occurrences beyond the maximum count in either input.",
+  "exception_raised": false,
+  "verified": true,
+  "copy_errors": {},
+  "files": {
+    "base.lean": "reconstructed by prefix merge; see prefix_* files",
+    "donor.lean": "extracted from donor_submitted.lean using LeanDagTools.extract",
+    "donor_submitted.lean": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-004/items/brualdi_ch10_60_sol-48f731fbd41448c8/proof/calls/r000002-n001-prover/result.json",
+    "candidate.lean": "replayed merge output matching the historical next-task input hash"
+  },
+  "problem": "brualdi_ch10_60",
+  "repetition": 4,
+  "run_id": "20261002T162236-1790958156725678901",
+  "merge_target": "offDiagonalOccurrences_card_even",
+  "merge_event": {
+    "timestamp": 1790959599.3008745,
+    "event_type": "prerequisite_merged",
+    "payload": {
+      "node": "brualdi_ch10_60",
+      "prerequisite": "offDiagonalOccurrences_card_even"
+    }
+  },
+  "prefix_merges": [
+    {
+      "target": "offDiagonalOccurrences_card",
+      "donor_call": "r000002-n000-prover",
+      "output_sha256": "65ccd452503ddbca06778cf0f81bbc49bc22de3d421eb009bc3f36b26171da4c"
+    }
+  ],
+  "historical_output_sha256": "1b10709b590f21ac95fedf8fb963500a98bac89573a37a967c9280934bcae122",
+  "matches_historical_output": true,
+  "historical_next_task_request": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-004/items/brualdi_ch10_60_sol-48f731fbd41448c8/proof/calls/r000003-n000-prover-work/request.json",
+  "historical_next_task_request_sha256": "4586a52d3c5879264b438f358f9602fc5490d0abd3c23dc324b7ea4f10d5260c",
+  "source_calls": {
+    "base": "r000001-n000-explorer",
+    "donor": "r000002-n001-prover",
+    "next": "r000003-n000-prover"
+  },
+  "statistics": {
+    "base": {
+      "characters": 5776,
+      "utf8_bytes": 5909,
+      "lines": 169,
+      "blank_lines": 25,
+      "single_line_comments": 8,
+      "distinct_single_line_comments": 4,
+      "duplicate_comment_lines": 4,
+      "sha256": "65ccd452503ddbca06778cf0f81bbc49bc22de3d421eb009bc3f36b26171da4c"
+    },
+    "donor": {
+      "characters": 2440,
+      "utf8_bytes": 2520,
+      "lines": 68,
+      "blank_lines": 6,
+      "single_line_comments": 4,
+      "distinct_single_line_comments": 4,
+      "duplicate_comment_lines": 0,
+      "sha256": "301fc97336e776ac77efd3b75032308be6371a7ece51863c227ce8032cdd80e8"
+    },
+    "output": {
+      "characters": 7706,
+      "utf8_bytes": 7892,
+      "lines": 247,
+      "blank_lines": 48,
+      "single_line_comments": 12,
+      "distinct_single_line_comments": 4,
+      "duplicate_comment_lines": 8,
+      "sha256": "1b10709b590f21ac95fedf8fb963500a98bac89573a37a967c9280934bcae122"
+    }
+  },
+  "comment_anomalies": [
+    {
+      "comment": "-- This count isolates the Latin-square and diagonal part of the argument:",
+      "base_lines": [
+        26,
+        154
+      ],
+      "donor_lines": [
+        14
+      ],
+      "output_lines": [
+        30,
+        107,
+        235
+      ],
+      "input_maximum_count": 2,
+      "output_count": 3,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- each symbol occurs once in every row, and idempotence removes its diagonal occurrence.",
+      "base_lines": [
+        27,
+        155
+      ],
+      "donor_lines": [
+        15
+      ],
+      "output_lines": [
+        31,
+        108,
+        236
+      ],
+      "input_maximum_count": 2,
+      "output_count": 3,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- Symmetry pairs the off-diagonal occurrences of a symbol by swapping the two indices,",
+      "base_lines": [
+        142,
+        158
+      ],
+      "donor_lines": [
+        18
+      ],
+      "output_lines": [
+        34,
+        223,
+        239
+      ],
+      "input_maximum_count": 2,
+      "output_count": 3,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- giving the parity fact needed to turn the preceding count into oddness of the order.",
+      "base_lines": [
+        143,
+        159
+      ],
+      "donor_lines": [
+        19
+      ],
+      "output_lines": [
+        35,
+        224,
+        240
+      ],
+      "input_maximum_count": 2,
+      "output_count": 3,
+      "excess_count": 1
+    }
+  ],
+  "excess_comment_lines": 4,
+  "worker_sha256": "c360cb1d4b7cda89032763df58f9d7785f16ea06c3eab8ecfb1207d390eac8cd",
+  "toolchain": "leanprover/lean4:v4.26.0"
+}

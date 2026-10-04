@@ -1,0 +1,11 @@
+Observed output anomaly; the merge did not raise an exception.
+Problem: balticway_2015_p7; repetition: 2; target: balticway_2015_p7_outside_clique
+Lean verified: True
+Matches historical output SHA-256: True
+Excess comment lines: 3
+-- This is the main counting step: the degree of each board member fixes the
+  base lines: [7]; donor lines: [7]; output lines: [19, 165]
+-- number of cross-edges, and the degree bound on each outside member then
+  base lines: [8]; donor lines: [8]; output lines: [20, 166]
+-- forces it to be adjacent to every other outside member.
+  base lines: [9]; donor lines: [9]; output lines: [21, 167]

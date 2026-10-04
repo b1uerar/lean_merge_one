@@ -1,0 +1,11 @@
+Observed output anomaly; the merge did not raise an exception.
+Problem: brualdi_ch9_13; repetition: 1; target: balanced_row_symbol_decomposition
+Lean verified: True
+Matches historical output SHA-256: True
+Excess comment lines: 3
+-- This is the regular bipartite multigraph factorization needed by the main
+  base lines: [3]; donor lines: [3]; output lines: [5, 253]
+-- theorem: split each row-symbol multiplicity matrix into n assignments,
+  base lines: [4]; donor lines: [4]; output lines: [6, 254]
+-- each of which uses every row once and each symbol r i times.
+  base lines: [5]; donor lines: [5]; output lines: [7, 255]

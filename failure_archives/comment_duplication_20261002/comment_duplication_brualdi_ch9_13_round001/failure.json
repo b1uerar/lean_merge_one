@@ -1,0 +1,132 @@
+{
+  "tool": "lean_merge",
+  "operation": "merge",
+  "created_at": "2026-10-03T06:55:38.005232+00:00",
+  "cwd": "/home/wwb/codes/agent/AgentProver",
+  "parameters": {
+    "target": "balanced_row_symbol_decomposition",
+    "proof": "balanced_row_symbol_decomposition",
+    "project": "/home/wwb/codes/numina/projects/leanproblems",
+    "timeout": 1200,
+    "use_def_eq": true,
+    "declarations_only": false
+  },
+  "error_type": "CommentDuplication",
+  "error": "Lean verification succeeds, but the merge adds 3 comment occurrences beyond the maximum count in either input.",
+  "exception_raised": false,
+  "verified": true,
+  "copy_errors": {},
+  "files": {
+    "base.lean": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-001/items/brualdi_ch9_13_sol-8c423f3ed72a4cb2/proof/calls/r000001-n000-explorer/result.json",
+    "donor.lean": "extracted from donor_submitted.lean using LeanDagTools.extract",
+    "donor_submitted.lean": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-001/items/brualdi_ch9_13_sol-8c423f3ed72a4cb2/proof/calls/r000002-n000-prover/result.json",
+    "candidate.lean": "replayed merge output matching the historical next-task input hash"
+  },
+  "problem": "brualdi_ch9_13",
+  "repetition": 1,
+  "run_id": "20261002T162236-1790958156725678901",
+  "merge_target": "balanced_row_symbol_decomposition",
+  "merge_event": {
+    "timestamp": 1790959348.411109,
+    "event_type": "prerequisite_merged",
+    "payload": {
+      "node": "brualdi_ch9_13",
+      "prerequisite": "balanced_row_symbol_decomposition"
+    }
+  },
+  "prefix_merges": [],
+  "historical_output_sha256": "da1f46044a9a6705fea0263f98adc9bd3d1575795952ca0bf5fc1890801bedf6",
+  "matches_historical_output": true,
+  "historical_next_task_request": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-001/items/brualdi_ch9_13_sol-8c423f3ed72a4cb2/proof/calls/r000003-n000-prover-work/request.json",
+  "historical_next_task_request_sha256": "d41993ee7fc00230bba54a46b3897ea0d9d10d7a553d1cadd73a31e0fe338bad",
+  "source_calls": {
+    "base": "r000001-n000-explorer",
+    "donor": "r000002-n000-prover",
+    "next": "r000003-n000-prover"
+  },
+  "statistics": {
+    "base": {
+      "characters": 1409,
+      "utf8_bytes": 1483,
+      "lines": 25,
+      "blank_lines": 2,
+      "single_line_comments": 3,
+      "distinct_single_line_comments": 3,
+      "duplicate_comment_lines": 0,
+      "sha256": "59ab54898ae28fd337b991636d7b988c377c6509e7dd83bcd8fd83d307248426"
+    },
+    "donor": {
+      "characters": 8834,
+      "utf8_bytes": 9208,
+      "lines": 243,
+      "blank_lines": 3,
+      "single_line_comments": 3,
+      "distinct_single_line_comments": 3,
+      "duplicate_comment_lines": 0,
+      "sha256": "d826b04ae767d024bac6acfa6e4821df765977095c5a621761d60265497fe340"
+    },
+    "output": {
+      "characters": 9863,
+      "utf8_bytes": 10275,
+      "lines": 267,
+      "blank_lines": 12,
+      "single_line_comments": 6,
+      "distinct_single_line_comments": 3,
+      "duplicate_comment_lines": 3,
+      "sha256": "da1f46044a9a6705fea0263f98adc9bd3d1575795952ca0bf5fc1890801bedf6"
+    }
+  },
+  "comment_anomalies": [
+    {
+      "comment": "-- This is the regular bipartite multigraph factorization needed by the main",
+      "base_lines": [
+        3
+      ],
+      "donor_lines": [
+        3
+      ],
+      "output_lines": [
+        5,
+        253
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- theorem: split each row-symbol multiplicity matrix into n assignments,",
+      "base_lines": [
+        4
+      ],
+      "donor_lines": [
+        4
+      ],
+      "output_lines": [
+        6,
+        254
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- each of which uses every row once and each symbol r i times.",
+      "base_lines": [
+        5
+      ],
+      "donor_lines": [
+        5
+      ],
+      "output_lines": [
+        7,
+        255
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    }
+  ],
+  "excess_comment_lines": 3,
+  "worker_sha256": "c360cb1d4b7cda89032763df58f9d7785f16ea06c3eab8ecfb1207d390eac8cd",
+  "toolchain": "leanprover/lean4:v4.26.0"
+}

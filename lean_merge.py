@@ -81,7 +81,7 @@ def _execute(
 def _execute_unrecorded(
     mode: str, base: str, donor: str = "", *, target: str | None = None,
     proof: str | None = None, project: str | Path | None = None,
-    lean: str = "lean", timeout: float = 120, use_def_eq: bool = True,
+    lean: str = "lean", timeout: float = 1200, use_def_eq: bool = True,
     declarations_only: bool = False,
     source_path: Path | None = None, archive: FailureArchive,
 ) -> dict:
@@ -185,7 +185,7 @@ def main(argv: list[str] | None = None) -> int:
         command.add_argument("-o", "--output", type=Path, help="write Lean source here; defaults to stdout")
         command.add_argument("--project", type=Path, help="Lake project, including built Mathlib dependencies")
         command.add_argument("--lean", default="lean", help="Lean executable; defaults to the project's toolchain")
-        command.add_argument("--timeout", type=float, default=120, help="total timeout in seconds")
+        command.add_argument("--timeout", type=float, default=1200, help="total timeout in seconds (default: %(default)s)")
         command.add_argument("--no-def-eq", action="store_true", help="require structural type equality")
         command.add_argument("--json", action="store_true", help="print structured result instead of Lean source")
         command.add_argument("--force", action="store_true", help="replace an existing output after verification")

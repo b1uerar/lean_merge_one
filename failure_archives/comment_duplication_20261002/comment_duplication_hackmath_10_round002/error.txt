@@ -1,0 +1,9 @@
+Observed output anomaly; the merge did not raise an exception.
+Problem: hackmath_10; repetition: 2; target: fin3_pair_sum_count
+Lean verified: True
+Matches historical output SHA-256: True
+Excess comment lines: 2
+-- This counts the bounded allocation pairs by separating the two fruit
+  base lines: [4]; donor lines: [142]; output lines: [155, 168]
+-- totals into independent weak-composition counts.
+  base lines: [5]; donor lines: [143]; output lines: [156, 169]

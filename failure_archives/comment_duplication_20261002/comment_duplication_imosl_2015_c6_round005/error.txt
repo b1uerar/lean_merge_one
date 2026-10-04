@@ -1,0 +1,27 @@
+Observed output anomaly; the merge did not raise an exception.
+Problem: imosl_2015_c6; repetition: 5; target: clean_tail_bounds_finite_cutoff
+Lean verified: True
+Matches historical output SHA-256: True
+Excess comment lines: 11
+-- In a contradiction argument where all sufficiently large integers are clean,
+  base lines: [7]; donor lines: [7]; output lines: [15, 106]
+-- this lets us track the unique representation after exchanging one element.
+  base lines: [8]; donor lines: [8]; output lines: [16, 107]
+-- This proves the finite-set case of the main theorem by bounding every
+  base lines: [49]; donor lines: [11]; output lines: [19, 148]
+-- possible representation by the sum of all elements of S.
+  base lines: [50]; donor lines: [12]; output lines: [20, 149]
+-- Appending an element outside both representations converts equal even
+  base lines: [72]; donor lines: [15]; output lines: [23, 171]
+-- representations into odd ones, where eventual cleanliness forces equality.
+  base lines: [73]; donor lines: [16]; output lines: [24, 172]
+-- Any representation of a clean number below a cutoff uses only elements
+  base lines: [132]; donor lines: [19]; output lines: [27, 231]
+-- below that cutoff, which makes finite initial segments control such sums.
+  base lines: [133]; donor lines: [20]; output lines: [28, 232]
+-- If every integer past N is clean, the clean integers before a cutoff t
+  base lines: [150]; donor lines: [23]; output lines: [31, 249]
+-- must all be supplied by odd subsets of F; counting those subsets bounds
+  base lines: [151]; donor lines: [24]; output lines: [32, 250]
+-- how quickly the finite initial segment can grow.
+  base lines: [152]; donor lines: [25]; output lines: [33, 251]

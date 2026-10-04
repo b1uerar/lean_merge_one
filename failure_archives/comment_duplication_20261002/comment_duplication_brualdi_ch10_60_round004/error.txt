@@ -1,0 +1,13 @@
+Observed output anomaly; the merge did not raise an exception.
+Problem: brualdi_ch10_60; repetition: 4; target: offDiagonalOccurrences_card_even
+Lean verified: True
+Matches historical output SHA-256: True
+Excess comment lines: 4
+-- This count isolates the Latin-square and diagonal part of the argument:
+  base lines: [26, 154]; donor lines: [14]; output lines: [30, 107, 235]
+-- each symbol occurs once in every row, and idempotence removes its diagonal occurrence.
+  base lines: [27, 155]; donor lines: [15]; output lines: [31, 108, 236]
+-- Symmetry pairs the off-diagonal occurrences of a symbol by swapping the two indices,
+  base lines: [142, 158]; donor lines: [18]; output lines: [34, 223, 239]
+-- giving the parity fact needed to turn the preceding count into oddness of the order.
+  base lines: [143, 159]; donor lines: [19]; output lines: [35, 224, 240]

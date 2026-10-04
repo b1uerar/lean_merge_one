@@ -1,0 +1,156 @@
+{
+  "verified": true,
+  "target": "fin3_pair_sum_count",
+  "strategy": "source",
+  "source": "import Mathlib\nsection\n\n\ndef tripleFn {α : Type} (x y z : α) : Fin 3 → α := ![x, y, z]\n\n\ndef Single (a : ℕ) :=\n  { f : Fin 3 → Fin (a + 1) // (∑ i, (f i).val) = a }\n\n\nnoncomputable instance singleFintype (a : ℕ) : Fintype (Single a) :=\n  by\n    classical\n    unfold Single\n    exact Fintype.subtype\n      (Finset.univ.filter (fun f : Fin 3 → Fin (a + 1) => (∑ i, (f i).val) = a))\n      (by intro f; simp)\n\n\ndef singleEncode (a : ℕ) (f : Single a) : Sym2 (Fin (a + 1)) :=\n  Sym2.mk (f.val 0,\n    ⟨(f.val 0).val + (f.val 1).val, by\n      have hs := f.property\n      simp [Fin.sum_univ_succ] at hs\n      omega⟩)\n\n\ndef singleDecode (a : ℕ) (s : Sym2 (Fin (a + 1))) : Single a :=\n  let p := (Sym2.sortEquiv (α := Fin (a + 1))) s\n  let x := p.val.1.val\n  let y := p.val.2.val - p.val.1.val\n  let z := a - p.val.2.val\n  ⟨tripleFn ⟨x, by\n      have hlt := p.val.1.isLt\n      omega⟩ ⟨y, by\n      have hp := p.property\n      have hpv := Fin.le_iff_val_le_val.mp hp\n      have hlt := p.val.2.isLt\n      omega⟩ ⟨z, by\n      have hlt := p.val.2.isLt\n      omega⟩, by\n    simp [tripleFn, Fin.sum_univ_succ]\n    have hp := p.property\n    have hpv := Fin.le_iff_val_le_val.mp hp\n    have hlt := p.val.2.isLt\n    omega⟩\n\n\nnoncomputable def singleEquiv (a : ℕ) :\n    Single a ≃ Sym2 (Fin (a + 1)) where\n  toFun := singleEncode a\n  invFun := singleDecode a\n  left_inv := by\n    intro f\n    apply Subtype.ext\n    have hs := f.property\n    simp [Fin.sum_univ_succ] at hs\n    have hxy : f.val 0 ≤\n        (⟨(f.val 0).val + (f.val 1).val, by omega⟩ : Fin (a + 1)) := by\n      exact Fin.le_iff_val_le_val.mpr (Nat.le_add_right _ _)\n    have hsort :\n        (Sym2.sortEquiv (α := Fin (a + 1))) (singleEncode a f) =\n          ⟨(f.val 0, ⟨(f.val 0).val + (f.val 1).val, by omega⟩), hxy⟩ := by\n      simp [singleEncode, Sym2.sortEquiv, Sym2.inf_mk, Sym2.sup_mk,\n        inf_eq_left.mpr hxy, sup_eq_right.mpr hxy]\n    funext i\n    fin_cases i <;>\n      apply Fin.ext <;>\n      simp [singleDecode, hsort, tripleFn] <;> omega\n  right_inv := by\n    intro s\n    have hleval : s.inf.val ≤ s.sup.val :=\n      Fin.le_iff_val_le_val.mp (Sym2.inf_le_sup s)\n    apply (Sym2.sortEquiv (α := Fin (a + 1))).injective\n    apply Subtype.ext\n    apply Prod.ext <;> apply Fin.ext <;>\n      simp [singleEncode, singleDecode, tripleFn,\n        Sym2.sortEquiv, Sym2.inf_mk, Sym2.sup_mk, hleval]\n\n\ntheorem single_card (a : ℕ) :\n    Fintype.card (Single a) = Nat.choose (a + 2) 2 := by\n  classical\n  calc\n    Fintype.card (Single a) = Fintype.card (Sym2 (Fin (a + 1))) :=\n      Fintype.card_congr (singleEquiv a)\n    _ = Nat.choose (Fintype.card (Fin (a + 1)) + 1) 2 := Sym2.card\n    _ = Nat.choose (a + 2) 2 := by simp\n\n\ndef PairDomain (a b : ℕ) :=\n  {f : Fin 3 → Fin (a + 1) × Fin (b + 1) //\n    (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b}\n\n\nnoncomputable instance pairDomainFintype (a b : ℕ) : Fintype (PairDomain a b) := by\n  classical\n  unfold PairDomain\n  exact Fintype.subtype\n    (Finset.univ.filter (fun f : Fin 3 → Fin (a + 1) × Fin (b + 1) =>\n      (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b))\n    (by intro f; simp)\n\n\nnoncomputable def pairSplitEquiv (a b : ℕ) :\n    PairDomain a b ≃ Single a × Single b where\n  toFun f :=\n    (⟨fun i => (f.val i).1, by\n      simpa [Fin.sum_univ_succ] using f.property.1⟩,\n     ⟨fun i => (f.val i).2, by\n      simpa [Fin.sum_univ_succ] using f.property.2⟩)\n  invFun uv :=\n    ⟨fun i => (uv.1.val i, uv.2.val i),\n      ⟨by simpa [Fin.sum_univ_succ] using uv.1.property,\n       by simpa [Fin.sum_univ_succ] using uv.2.property⟩⟩\n  left_inv := by\n    intro f\n    apply Subtype.ext\n    funext i\n    rfl\n  right_inv := by\n    rintro ⟨x, y⟩\n    apply Prod.ext\n    · apply Subtype.ext\n      funext i\n      rfl\n    · apply Subtype.ext\n      funext i\n      rfl\n\n\ntheorem pair_card (a b : ℕ) :\n    (Finset.univ.filter (fun f : Fin 3 → Fin (a + 1) × Fin (b + 1) =>\n      (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b)).card =\n      Nat.choose (a + 2) 2 * Nat.choose (b + 2) 2 := by\n  classical\n  let pred : (Fin 3 → Fin (a + 1) × Fin (b + 1)) → Prop :=\n    fun f => (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b\n  have hcard :\n      Fintype.card (PairDomain a b) =\n        (Finset.univ.filter pred).card := by\n    exact Fintype.card_of_subtype (Finset.univ.filter pred) (by\n      intro f\n      simp [pred])\n  calc\n    _ = Fintype.card (PairDomain a b) := hcard.symm\n    _ = Fintype.card (Single a × Single b) :=\n      Fintype.card_congr (pairSplitEquiv a b)\n    _ = Nat.choose (a + 2) 2 * Nat.choose (b + 2) 2 := by\n      rw [Fintype.card_prod, single_card, single_card]\n\n\n\n-- This counts the bounded allocation pairs by separating the two fruit\n-- totals into independent weak-composition counts.\ntheorem fin3_pair_sum_count (a b : ℕ) :\n    (Finset.univ.filter (fun f : Fin 3 → Fin (a + 1) × Fin (b + 1) =>\n      (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b)).card =\n        Nat.choose (a + 2) 2 * Nat.choose (b + 2) 2 := by\n  exact pair_card a b\n\n\nend\n\n\n\n-- This counts the bounded allocation pairs by separating the two fruit\n-- totals into independent weak-composition counts.\n\n\n/--\nHow many different ways can three people divide seven pears and five apples?\n-/\ntheorem hackmath_10 (sols : Finset (Fin 3 → (ℕ × ℕ)))\n    (h_sols : ∀ f, f ∈ sols ↔ (∑ i, (f i).1 = 7 ∧ ∑ i, (f i).2 = 5)) :\n    sols.card = ((756) : ℕ ) := by sorry\n",
+  "reused": [],
+  "proof": "fin3_pair_sum_count",
+  "okay": true,
+  "inserted": [
+    "tripleFn",
+    "Single",
+    "singleFintype",
+    "singleFintype._proof_1",
+    "singleEncode",
+    "singleEncode._proof_3",
+    "singleEncode._proof_2",
+    "singleEncode._proof_1",
+    "singleDecode._proof_5",
+    "singleDecode._proof_7",
+    "singleDecode",
+    "singleDecode._proof_6",
+    "tripleFn.eq_1",
+    "singleDecode._proof_3",
+    "singleDecode._proof_2",
+    "singleDecode._proof_4",
+    "singleDecode._proof_1",
+    "singleEquiv._proof_3",
+    "singleEquiv._proof_2",
+    "singleEncode.eq_1",
+    "singleEquiv._proof_4",
+    "singleEquiv._proof_1",
+    "singleDecode.eq_1",
+    "singleEquiv",
+    "Sym2.sortEquiv.eq_1",
+    "single_card",
+    "PairDomain",
+    "pairDomainFintype._proof_1",
+    "pairDomainFintype",
+    "pairSplitEquiv._proof_7",
+    "pairSplitEquiv._proof_3",
+    "pairSplitEquiv._proof_2",
+    "pairSplitEquiv._proof_5",
+    "pairSplitEquiv._proof_8",
+    "pairSplitEquiv._proof_6",
+    "pairSplitEquiv",
+    "pairSplitEquiv._proof_4",
+    "pairSplitEquiv._proof_1",
+    "pair_card"
+  ],
+  "content": "import Mathlib\nsection\n\n\ndef tripleFn {α : Type} (x y z : α) : Fin 3 → α := ![x, y, z]\n\n\ndef Single (a : ℕ) :=\n  { f : Fin 3 → Fin (a + 1) // (∑ i, (f i).val) = a }\n\n\nnoncomputable instance singleFintype (a : ℕ) : Fintype (Single a) :=\n  by\n    classical\n    unfold Single\n    exact Fintype.subtype\n      (Finset.univ.filter (fun f : Fin 3 → Fin (a + 1) => (∑ i, (f i).val) = a))\n      (by intro f; simp)\n\n\ndef singleEncode (a : ℕ) (f : Single a) : Sym2 (Fin (a + 1)) :=\n  Sym2.mk (f.val 0,\n    ⟨(f.val 0).val + (f.val 1).val, by\n      have hs := f.property\n      simp [Fin.sum_univ_succ] at hs\n      omega⟩)\n\n\ndef singleDecode (a : ℕ) (s : Sym2 (Fin (a + 1))) : Single a :=\n  let p := (Sym2.sortEquiv (α := Fin (a + 1))) s\n  let x := p.val.1.val\n  let y := p.val.2.val - p.val.1.val\n  let z := a - p.val.2.val\n  ⟨tripleFn ⟨x, by\n      have hlt := p.val.1.isLt\n      omega⟩ ⟨y, by\n      have hp := p.property\n      have hpv := Fin.le_iff_val_le_val.mp hp\n      have hlt := p.val.2.isLt\n      omega⟩ ⟨z, by\n      have hlt := p.val.2.isLt\n      omega⟩, by\n    simp [tripleFn, Fin.sum_univ_succ]\n    have hp := p.property\n    have hpv := Fin.le_iff_val_le_val.mp hp\n    have hlt := p.val.2.isLt\n    omega⟩\n\n\nnoncomputable def singleEquiv (a : ℕ) :\n    Single a ≃ Sym2 (Fin (a + 1)) where\n  toFun := singleEncode a\n  invFun := singleDecode a\n  left_inv := by\n    intro f\n    apply Subtype.ext\n    have hs := f.property\n    simp [Fin.sum_univ_succ] at hs\n    have hxy : f.val 0 ≤\n        (⟨(f.val 0).val + (f.val 1).val, by omega⟩ : Fin (a + 1)) := by\n      exact Fin.le_iff_val_le_val.mpr (Nat.le_add_right _ _)\n    have hsort :\n        (Sym2.sortEquiv (α := Fin (a + 1))) (singleEncode a f) =\n          ⟨(f.val 0, ⟨(f.val 0).val + (f.val 1).val, by omega⟩), hxy⟩ := by\n      simp [singleEncode, Sym2.sortEquiv, Sym2.inf_mk, Sym2.sup_mk,\n        inf_eq_left.mpr hxy, sup_eq_right.mpr hxy]\n    funext i\n    fin_cases i <;>\n      apply Fin.ext <;>\n      simp [singleDecode, hsort, tripleFn] <;> omega\n  right_inv := by\n    intro s\n    have hleval : s.inf.val ≤ s.sup.val :=\n      Fin.le_iff_val_le_val.mp (Sym2.inf_le_sup s)\n    apply (Sym2.sortEquiv (α := Fin (a + 1))).injective\n    apply Subtype.ext\n    apply Prod.ext <;> apply Fin.ext <;>\n      simp [singleEncode, singleDecode, tripleFn,\n        Sym2.sortEquiv, Sym2.inf_mk, Sym2.sup_mk, hleval]\n\n\ntheorem single_card (a : ℕ) :\n    Fintype.card (Single a) = Nat.choose (a + 2) 2 := by\n  classical\n  calc\n    Fintype.card (Single a) = Fintype.card (Sym2 (Fin (a + 1))) :=\n      Fintype.card_congr (singleEquiv a)\n    _ = Nat.choose (Fintype.card (Fin (a + 1)) + 1) 2 := Sym2.card\n    _ = Nat.choose (a + 2) 2 := by simp\n\n\ndef PairDomain (a b : ℕ) :=\n  {f : Fin 3 → Fin (a + 1) × Fin (b + 1) //\n    (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b}\n\n\nnoncomputable instance pairDomainFintype (a b : ℕ) : Fintype (PairDomain a b) := by\n  classical\n  unfold PairDomain\n  exact Fintype.subtype\n    (Finset.univ.filter (fun f : Fin 3 → Fin (a + 1) × Fin (b + 1) =>\n      (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b))\n    (by intro f; simp)\n\n\nnoncomputable def pairSplitEquiv (a b : ℕ) :\n    PairDomain a b ≃ Single a × Single b where\n  toFun f :=\n    (⟨fun i => (f.val i).1, by\n      simpa [Fin.sum_univ_succ] using f.property.1⟩,\n     ⟨fun i => (f.val i).2, by\n      simpa [Fin.sum_univ_succ] using f.property.2⟩)\n  invFun uv :=\n    ⟨fun i => (uv.1.val i, uv.2.val i),\n      ⟨by simpa [Fin.sum_univ_succ] using uv.1.property,\n       by simpa [Fin.sum_univ_succ] using uv.2.property⟩⟩\n  left_inv := by\n    intro f\n    apply Subtype.ext\n    funext i\n    rfl\n  right_inv := by\n    rintro ⟨x, y⟩\n    apply Prod.ext\n    · apply Subtype.ext\n      funext i\n      rfl\n    · apply Subtype.ext\n      funext i\n      rfl\n\n\ntheorem pair_card (a b : ℕ) :\n    (Finset.univ.filter (fun f : Fin 3 → Fin (a + 1) × Fin (b + 1) =>\n      (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b)).card =\n      Nat.choose (a + 2) 2 * Nat.choose (b + 2) 2 := by\n  classical\n  let pred : (Fin 3 → Fin (a + 1) × Fin (b + 1)) → Prop :=\n    fun f => (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b\n  have hcard :\n      Fintype.card (PairDomain a b) =\n        (Finset.univ.filter pred).card := by\n    exact Fintype.card_of_subtype (Finset.univ.filter pred) (by\n      intro f\n      simp [pred])\n  calc\n    _ = Fintype.card (PairDomain a b) := hcard.symm\n    _ = Fintype.card (Single a × Single b) :=\n      Fintype.card_congr (pairSplitEquiv a b)\n    _ = Nat.choose (a + 2) 2 * Nat.choose (b + 2) 2 := by\n      rw [Fintype.card_prod, single_card, single_card]\n\n\n\n-- This counts the bounded allocation pairs by separating the two fruit\n-- totals into independent weak-composition counts.\ntheorem fin3_pair_sum_count (a b : ℕ) :\n    (Finset.univ.filter (fun f : Fin 3 → Fin (a + 1) × Fin (b + 1) =>\n      (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b)).card =\n        Nat.choose (a + 2) 2 * Nat.choose (b + 2) 2 := by\n  exact pair_card a b\n\n\nend\n\n\n\n-- This counts the bounded allocation pairs by separating the two fruit\n-- totals into independent weak-composition counts.\n\n\n/--\nHow many different ways can three people divide seven pears and five apples?\n-/\ntheorem hackmath_10 (sols : Finset (Fin 3 → (ℕ × ℕ)))\n    (h_sols : ∀ f, f ∈ sols ↔ (∑ i, (f i).1 = 7 ∧ ∑ i, (f i).2 = 5)) :\n    sols.card = ((756) : ℕ ) := by sorry\n",
+  "axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "added_commands": [
+    {
+      "source": "def tripleFn {α : Type} (x y z : α) : Fin 3 → α := ![x, y, z]",
+      "names": [
+        "tripleFn"
+      ]
+    },
+    {
+      "source": "def Single (a : ℕ) :=\n  { f : Fin 3 → Fin (a + 1) // (∑ i, (f i).val) = a }",
+      "names": [
+        "Single"
+      ]
+    },
+    {
+      "source": "noncomputable instance singleFintype (a : ℕ) : Fintype (Single a) :=\n  by\n    classical\n    unfold Single\n    exact Fintype.subtype\n      (Finset.univ.filter (fun f : Fin 3 → Fin (a + 1) => (∑ i, (f i).val) = a))\n      (by intro f; simp)",
+      "names": [
+        "singleFintype",
+        "singleFintype._proof_1"
+      ]
+    },
+    {
+      "source": "def singleEncode (a : ℕ) (f : Single a) : Sym2 (Fin (a + 1)) :=\n  Sym2.mk (f.val 0,\n    ⟨(f.val 0).val + (f.val 1).val, by\n      have hs := f.property\n      simp [Fin.sum_univ_succ] at hs\n      omega⟩)",
+      "names": [
+        "singleEncode",
+        "singleEncode._proof_3",
+        "singleEncode._proof_2",
+        "singleEncode._proof_1"
+      ]
+    },
+    {
+      "source": "def singleDecode (a : ℕ) (s : Sym2 (Fin (a + 1))) : Single a :=\n  let p := (Sym2.sortEquiv (α := Fin (a + 1))) s\n  let x := p.val.1.val\n  let y := p.val.2.val - p.val.1.val\n  let z := a - p.val.2.val\n  ⟨tripleFn ⟨x, by\n      have hlt := p.val.1.isLt\n      omega⟩ ⟨y, by\n      have hp := p.property\n      have hpv := Fin.le_iff_val_le_val.mp hp\n      have hlt := p.val.2.isLt\n      omega⟩ ⟨z, by\n      have hlt := p.val.2.isLt\n      omega⟩, by\n    simp [tripleFn, Fin.sum_univ_succ]\n    have hp := p.property\n    have hpv := Fin.le_iff_val_le_val.mp hp\n    have hlt := p.val.2.isLt\n    omega⟩",
+      "names": [
+        "singleDecode._proof_5",
+        "singleDecode._proof_7",
+        "singleDecode",
+        "singleDecode._proof_6",
+        "tripleFn.eq_1",
+        "singleDecode._proof_3",
+        "singleDecode._proof_2",
+        "singleDecode._proof_4",
+        "singleDecode._proof_1"
+      ]
+    },
+    {
+      "source": "noncomputable def singleEquiv (a : ℕ) :\n    Single a ≃ Sym2 (Fin (a + 1)) where\n  toFun := singleEncode a\n  invFun := singleDecode a\n  left_inv := by\n    intro f\n    apply Subtype.ext\n    have hs := f.property\n    simp [Fin.sum_univ_succ] at hs\n    have hxy : f.val 0 ≤\n        (⟨(f.val 0).val + (f.val 1).val, by omega⟩ : Fin (a + 1)) := by\n      exact Fin.le_iff_val_le_val.mpr (Nat.le_add_right _ _)\n    have hsort :\n        (Sym2.sortEquiv (α := Fin (a + 1))) (singleEncode a f) =\n          ⟨(f.val 0, ⟨(f.val 0).val + (f.val 1).val, by omega⟩), hxy⟩ := by\n      simp [singleEncode, Sym2.sortEquiv, Sym2.inf_mk, Sym2.sup_mk,\n        inf_eq_left.mpr hxy, sup_eq_right.mpr hxy]\n    funext i\n    fin_cases i <;>\n      apply Fin.ext <;>\n      simp [singleDecode, hsort, tripleFn] <;> omega\n  right_inv := by\n    intro s\n    have hleval : s.inf.val ≤ s.sup.val :=\n      Fin.le_iff_val_le_val.mp (Sym2.inf_le_sup s)\n    apply (Sym2.sortEquiv (α := Fin (a + 1))).injective\n    apply Subtype.ext\n    apply Prod.ext <;> apply Fin.ext <;>\n      simp [singleEncode, singleDecode, tripleFn,\n        Sym2.sortEquiv, Sym2.inf_mk, Sym2.sup_mk, hleval]",
+      "names": [
+        "singleEquiv._proof_3",
+        "singleEquiv._proof_2",
+        "singleEncode.eq_1",
+        "singleEquiv._proof_4",
+        "singleEquiv._proof_1",
+        "singleDecode.eq_1",
+        "singleEquiv",
+        "Sym2.sortEquiv.eq_1"
+      ]
+    },
+    {
+      "source": "theorem single_card (a : ℕ) :\n    Fintype.card (Single a) = Nat.choose (a + 2) 2 := by\n  classical\n  calc\n    Fintype.card (Single a) = Fintype.card (Sym2 (Fin (a + 1))) :=\n      Fintype.card_congr (singleEquiv a)\n    _ = Nat.choose (Fintype.card (Fin (a + 1)) + 1) 2 := Sym2.card\n    _ = Nat.choose (a + 2) 2 := by simp",
+      "names": [
+        "single_card"
+      ]
+    },
+    {
+      "source": "def PairDomain (a b : ℕ) :=\n  {f : Fin 3 → Fin (a + 1) × Fin (b + 1) //\n    (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b}",
+      "names": [
+        "PairDomain"
+      ]
+    },
+    {
+      "source": "noncomputable instance pairDomainFintype (a b : ℕ) : Fintype (PairDomain a b) := by\n  classical\n  unfold PairDomain\n  exact Fintype.subtype\n    (Finset.univ.filter (fun f : Fin 3 → Fin (a + 1) × Fin (b + 1) =>\n      (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b))\n    (by intro f; simp)",
+      "names": [
+        "pairDomainFintype._proof_1",
+        "pairDomainFintype"
+      ]
+    },
+    {
+      "source": "noncomputable def pairSplitEquiv (a b : ℕ) :\n    PairDomain a b ≃ Single a × Single b where\n  toFun f :=\n    (⟨fun i => (f.val i).1, by\n      simpa [Fin.sum_univ_succ] using f.property.1⟩,\n     ⟨fun i => (f.val i).2, by\n      simpa [Fin.sum_univ_succ] using f.property.2⟩)\n  invFun uv :=\n    ⟨fun i => (uv.1.val i, uv.2.val i),\n      ⟨by simpa [Fin.sum_univ_succ] using uv.1.property,\n       by simpa [Fin.sum_univ_succ] using uv.2.property⟩⟩\n  left_inv := by\n    intro f\n    apply Subtype.ext\n    funext i\n    rfl\n  right_inv := by\n    rintro ⟨x, y⟩\n    apply Prod.ext\n    · apply Subtype.ext\n      funext i\n      rfl\n    · apply Subtype.ext\n      funext i\n      rfl",
+      "names": [
+        "pairSplitEquiv._proof_7",
+        "pairSplitEquiv._proof_3",
+        "pairSplitEquiv._proof_2",
+        "pairSplitEquiv._proof_5",
+        "pairSplitEquiv._proof_8",
+        "pairSplitEquiv._proof_6",
+        "pairSplitEquiv",
+        "pairSplitEquiv._proof_4",
+        "pairSplitEquiv._proof_1"
+      ]
+    },
+    {
+      "source": "theorem pair_card (a b : ℕ) :\n    (Finset.univ.filter (fun f : Fin 3 → Fin (a + 1) × Fin (b + 1) =>\n      (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b)).card =\n      Nat.choose (a + 2) 2 * Nat.choose (b + 2) 2 := by\n  classical\n  let pred : (Fin 3 → Fin (a + 1) × Fin (b + 1)) → Prop :=\n    fun f => (∑ i, (f i).1.val) = a ∧ (∑ i, (f i).2.val) = b\n  have hcard :\n      Fintype.card (PairDomain a b) =\n        (Finset.univ.filter pred).card := by\n    exact Fintype.card_of_subtype (Finset.univ.filter pred) (by\n      intro f\n      simp [pred])\n  calc\n    _ = Fintype.card (PairDomain a b) := hcard.symm\n    _ = Fintype.card (Single a × Single b) :=\n      Fintype.card_congr (pairSplitEquiv a b)\n    _ = Nat.choose (a + 2) 2 * Nat.choose (b + 2) 2 := by\n      rw [Fintype.card_prod, single_card, single_card]",
+      "names": [
+        "pair_card"
+      ]
+    }
+  ],
+  "lean_version": "Lean (version 4.26.0, x86_64-unknown-linux-gnu, commit d8204c9fd894f91bbb2cdfec5912ec8196fd8562, Release)",
+  "timings": {
+    "total_ms": 56339
+  }
+}

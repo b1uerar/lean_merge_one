@@ -1,0 +1,116 @@
+{
+  "tool": "lean_merge",
+  "operation": "merge",
+  "created_at": "2026-10-03T06:57:05.193781+00:00",
+  "cwd": "/home/wwb/codes/agent/AgentProver",
+  "parameters": {
+    "target": "fin3_pair_sum_count",
+    "proof": "fin3_pair_sum_count",
+    "project": "/home/wwb/codes/numina/projects/leanproblems",
+    "timeout": 1200,
+    "use_def_eq": true,
+    "declarations_only": false
+  },
+  "error_type": "CommentDuplication",
+  "error": "Lean verification succeeds, but the merge adds 2 comment occurrences beyond the maximum count in either input.",
+  "exception_raised": false,
+  "verified": true,
+  "copy_errors": {},
+  "files": {
+    "base.lean": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-002/items/hackmath_10_sol-d20d6db3c5de05ec/proof/calls/r000001-n000-explorer/result.json",
+    "donor.lean": "extracted from donor_submitted.lean using LeanDagTools.extract",
+    "donor_submitted.lean": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-002/items/hackmath_10_sol-d20d6db3c5de05ec/proof/calls/r000002-n000-prover/result.json",
+    "candidate.lean": "replayed merge output matching the historical next-task input hash"
+  },
+  "problem": "hackmath_10",
+  "repetition": 2,
+  "run_id": "20261002T162236-1790958156725678901",
+  "merge_target": "fin3_pair_sum_count",
+  "merge_event": {
+    "timestamp": 1790959437.7759671,
+    "event_type": "prerequisite_merged",
+    "payload": {
+      "node": "hackmath_10",
+      "prerequisite": "fin3_pair_sum_count"
+    }
+  },
+  "prefix_merges": [],
+  "historical_output_sha256": "c2e1d990ab0848901f41214b534670673133c377269f15bdeda1075a9b727fc1",
+  "matches_historical_output": true,
+  "historical_next_task_request": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-002/items/hackmath_10_sol-d20d6db3c5de05ec/proof/calls/r000003-n000-prover-work/request.json",
+  "historical_next_task_request_sha256": "6c2c47f3576639a73f2b10b63a5d9a8245c4eda9e0f16975df938eb34b89ea1f",
+  "source_calls": {
+    "base": "r000001-n000-explorer",
+    "donor": "r000002-n000-prover",
+    "next": "r000003-n000-prover"
+  },
+  "statistics": {
+    "base": {
+      "characters": 631,
+      "utf8_bytes": 663,
+      "lines": 17,
+      "blank_lines": 3,
+      "single_line_comments": 2,
+      "distinct_single_line_comments": 2,
+      "duplicate_comment_lines": 0,
+      "sha256": "1d691132d40c6758f0cda6d89bc4272c4d8eebba798af68c85e7e1fffe8afdb2"
+    },
+    "donor": {
+      "characters": 4929,
+      "utf8_bytes": 5078,
+      "lines": 148,
+      "blank_lines": 13,
+      "single_line_comments": 2,
+      "distinct_single_line_comments": 2,
+      "duplicate_comment_lines": 0,
+      "sha256": "5bc326d0f53f40a44bae214b424de85242a243c0460f88e8b5099addbe6b41cf"
+    },
+    "output": {
+      "characters": 5334,
+      "utf8_bytes": 5504,
+      "lines": 177,
+      "blank_lines": 32,
+      "single_line_comments": 4,
+      "distinct_single_line_comments": 2,
+      "duplicate_comment_lines": 2,
+      "sha256": "c2e1d990ab0848901f41214b534670673133c377269f15bdeda1075a9b727fc1"
+    }
+  },
+  "comment_anomalies": [
+    {
+      "comment": "-- This counts the bounded allocation pairs by separating the two fruit",
+      "base_lines": [
+        4
+      ],
+      "donor_lines": [
+        142
+      ],
+      "output_lines": [
+        155,
+        168
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- totals into independent weak-composition counts.",
+      "base_lines": [
+        5
+      ],
+      "donor_lines": [
+        143
+      ],
+      "output_lines": [
+        156,
+        169
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    }
+  ],
+  "excess_comment_lines": 2,
+  "worker_sha256": "c360cb1d4b7cda89032763df58f9d7785f16ea06c3eab8ecfb1207d390eac8cd",
+  "toolchain": "leanprover/lean4:v4.26.0"
+}

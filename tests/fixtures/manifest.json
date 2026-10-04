@@ -62,6 +62,66 @@
       "bytes": 14618,
       "sha256": "d39cc30332bc27deae5f3fecbf651ecb29e256e343080543ac286880028d3067",
       "source": "failures/20261001T174300.618116Z-e4xyj5ea/donor.lean"
+    },
+    "comment_regressions/balticway_2015_p7/Base.lean": {
+      "bytes": 1761,
+      "sha256": "457722cf3d282f9cd404bb265d66ecdf821e4c9dc26a60cacc0052ee62464ab6",
+      "source": "failures/comment_duplication_balticway_2015_p7_round002/base.lean"
+    },
+    "comment_regressions/balticway_2015_p7/Donor.lean": {
+      "bytes": 6349,
+      "sha256": "24fd7d30c1a76bc05120d34cb5df6e101ef89d32cb9473650ae4165ecb9f87dc",
+      "source": "failures/comment_duplication_balticway_2015_p7_round002/donor.lean"
+    },
+    "comment_regressions/brualdi_ch10_60/Base.lean": {
+      "bytes": 5909,
+      "sha256": "65ccd452503ddbca06778cf0f81bbc49bc22de3d421eb009bc3f36b26171da4c",
+      "source": "failures/comment_duplication_brualdi_ch10_60_round004/base.lean"
+    },
+    "comment_regressions/brualdi_ch10_60/Donor.lean": {
+      "bytes": 2520,
+      "sha256": "301fc97336e776ac77efd3b75032308be6371a7ece51863c227ce8032cdd80e8",
+      "source": "failures/comment_duplication_brualdi_ch10_60_round004/donor.lean"
+    },
+    "comment_regressions/brualdi_ch10_60/PrefixBase.lean": {
+      "bytes": 1386,
+      "sha256": "cd31e30bd0468951b91cd355e65601fba4e09c7ba25d1cbf4904c144e49ae29e",
+      "source": "failures/comment_duplication_brualdi_ch10_60_round004/prefix_base.lean"
+    },
+    "comment_regressions/brualdi_ch10_60/PrefixDonor.lean": {
+      "bytes": 5155,
+      "sha256": "aa6c54453f9e58590d63bca83ede07d0be17eb0f34796ddc70d820b18e44f8a0",
+      "source": "failures/comment_duplication_brualdi_ch10_60_round004/prefix_donor.lean"
+    },
+    "comment_regressions/brualdi_ch9_13/Base.lean": {
+      "bytes": 1483,
+      "sha256": "59ab54898ae28fd337b991636d7b988c377c6509e7dd83bcd8fd83d307248426",
+      "source": "failures/comment_duplication_brualdi_ch9_13_round001/base.lean"
+    },
+    "comment_regressions/brualdi_ch9_13/Donor.lean": {
+      "bytes": 9208,
+      "sha256": "d826b04ae767d024bac6acfa6e4821df765977095c5a621761d60265497fe340",
+      "source": "failures/comment_duplication_brualdi_ch9_13_round001/donor.lean"
+    },
+    "comment_regressions/hackmath_10/Base.lean": {
+      "bytes": 663,
+      "sha256": "1d691132d40c6758f0cda6d89bc4272c4d8eebba798af68c85e7e1fffe8afdb2",
+      "source": "failures/comment_duplication_hackmath_10_round002/base.lean"
+    },
+    "comment_regressions/hackmath_10/Donor.lean": {
+      "bytes": 5078,
+      "sha256": "5bc326d0f53f40a44bae214b424de85242a243c0460f88e8b5099addbe6b41cf",
+      "source": "failures/comment_duplication_hackmath_10_round002/donor.lean"
+    },
+    "comment_regressions/imosl_2015_c6/Base.lean": {
+      "bytes": 6707,
+      "sha256": "10c02783aed9b280f9738188af9d571f45dc55ab60c89631f3ce8d7e15012305",
+      "source": "failures/comment_duplication_imosl_2015_c6_round005/base.lean"
+    },
+    "comment_regressions/imosl_2015_c6/Donor.lean": {
+      "bytes": 3434,
+      "sha256": "88fa98ad9df688372262cac3fa2c82fa32817b1c86e25da8fb6735dd9aca88c4",
+      "source": "failures/comment_duplication_imosl_2015_c6_round005/donor.lean"
     }
   },
   "cases": {
@@ -122,6 +182,53 @@
       "preserved_targets": [
         "odd_subset_count_lt_total_of_injective"
       ]
+    },
+    "comments_balticway_2015_p7": {
+      "base": "comment_regressions/balticway_2015_p7/Base.lean",
+      "donor": "comment_regressions/balticway_2015_p7/Donor.lean",
+      "target": "balticway_2015_p7_outside_clique",
+      "max_output_bytes": 12206,
+      "source_failure": "comment_duplication_balticway_2015_p7_round002",
+      "check_comment_counts": true
+    },
+    "comments_brualdi_ch10_60": {
+      "base": "comment_regressions/brualdi_ch10_60/Base.lean",
+      "donor": "comment_regressions/brualdi_ch10_60/Donor.lean",
+      "target": "offDiagonalOccurrences_card_even",
+      "max_output_bytes": 12525,
+      "source_failure": "comment_duplication_brualdi_ch10_60_round004",
+      "check_comment_counts": true
+    },
+    "comments_brualdi_ch10_60_prefix": {
+      "base": "comment_regressions/brualdi_ch10_60/PrefixBase.lean",
+      "donor": "comment_regressions/brualdi_ch10_60/PrefixDonor.lean",
+      "target": "offDiagonalOccurrences_card",
+      "check_comment_counts": true,
+      "max_output_bytes": 10637
+    },
+    "comments_brualdi_ch9_13": {
+      "base": "comment_regressions/brualdi_ch9_13/Base.lean",
+      "donor": "comment_regressions/brualdi_ch9_13/Donor.lean",
+      "target": "balanced_row_symbol_decomposition",
+      "max_output_bytes": 14787,
+      "source_failure": "comment_duplication_brualdi_ch9_13_round001",
+      "check_comment_counts": true
+    },
+    "comments_hackmath_10": {
+      "base": "comment_regressions/hackmath_10/Base.lean",
+      "donor": "comment_regressions/hackmath_10/Donor.lean",
+      "target": "fin3_pair_sum_count",
+      "max_output_bytes": 9837,
+      "source_failure": "comment_duplication_hackmath_10_round002",
+      "check_comment_counts": true
+    },
+    "comments_imosl_2015_c6": {
+      "base": "comment_regressions/imosl_2015_c6/Base.lean",
+      "donor": "comment_regressions/imosl_2015_c6/Donor.lean",
+      "target": "clean_tail_bounds_finite_cutoff",
+      "max_output_bytes": 14237,
+      "source_failure": "comment_duplication_imosl_2015_c6_round005",
+      "check_comment_counts": true
     }
   },
   "egmo_sequence": [

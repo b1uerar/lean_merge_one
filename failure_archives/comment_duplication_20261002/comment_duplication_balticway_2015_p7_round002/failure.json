@@ -1,0 +1,132 @@
+{
+  "tool": "lean_merge",
+  "operation": "merge",
+  "created_at": "2026-10-03T06:55:29.978433+00:00",
+  "cwd": "/home/wwb/codes/agent/AgentProver",
+  "parameters": {
+    "target": "balticway_2015_p7_outside_clique",
+    "proof": "balticway_2015_p7_outside_clique",
+    "project": "/home/wwb/codes/numina/projects/leanproblems",
+    "timeout": 1200,
+    "use_def_eq": true,
+    "declarations_only": false
+  },
+  "error_type": "CommentDuplication",
+  "error": "Lean verification succeeds, but the merge adds 3 comment occurrences beyond the maximum count in either input.",
+  "exception_raised": false,
+  "verified": true,
+  "copy_errors": {},
+  "files": {
+    "base.lean": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-002/items/balticway_2015_p7_sol-2c1e86000557f208/proof/calls/r000001-n000-explorer/result.json",
+    "donor.lean": "extracted from donor_submitted.lean using LeanDagTools.extract",
+    "donor_submitted.lean": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-002/items/balticway_2015_p7_sol-2c1e86000557f208/proof/calls/r000002-n000-prover/result.json",
+    "candidate.lean": "replayed merge output matching the historical next-task input hash"
+  },
+  "problem": "balticway_2015_p7",
+  "repetition": 2,
+  "run_id": "20261002T162236-1790958156725678901",
+  "merge_target": "balticway_2015_p7_outside_clique",
+  "merge_event": {
+    "timestamp": 1790959229.5576138,
+    "event_type": "prerequisite_merged",
+    "payload": {
+      "node": "balticway_2015_p7",
+      "prerequisite": "balticway_2015_p7_outside_clique"
+    }
+  },
+  "prefix_merges": [],
+  "historical_output_sha256": "c309fdbd999f56b546506bb418b8ee53d2b05ddcd1d1b7b0cacd671c076c8dff",
+  "matches_historical_output": true,
+  "historical_next_task_request": "/home/wwb/codes/agent/AgentProver/runs_exp/python_runner/history/20261002T162236-1790958156725678901/round-002/items/balticway_2015_p7_sol-2c1e86000557f208/proof/calls/r000003-n000-prover-work/request.json",
+  "historical_next_task_request_sha256": "ff393c7d6c84eef880a10576a724f7eada6f58f37abe329bcb70ac54b653960c",
+  "source_calls": {
+    "base": "r000001-n000-explorer",
+    "donor": "r000002-n000-prover",
+    "next": "r000003-n000-prover"
+  },
+  "statistics": {
+    "base": {
+      "characters": 1730,
+      "utf8_bytes": 1761,
+      "lines": 37,
+      "blank_lines": 4,
+      "single_line_comments": 3,
+      "distinct_single_line_comments": 3,
+      "duplicate_comment_lines": 0,
+      "sha256": "457722cf3d282f9cd404bb265d66ecdf821e4c9dc26a60cacc0052ee62464ab6"
+    },
+    "donor": {
+      "characters": 6201,
+      "utf8_bytes": 6349,
+      "lines": 143,
+      "blank_lines": 3,
+      "single_line_comments": 3,
+      "distinct_single_line_comments": 3,
+      "duplicate_comment_lines": 0,
+      "sha256": "24fd7d30c1a76bc05120d34cb5df6e101ef89d32cb9473650ae4165ecb9f87dc"
+    },
+    "output": {
+      "characters": 7605,
+      "utf8_bytes": 7780,
+      "lines": 189,
+      "blank_lines": 20,
+      "single_line_comments": 6,
+      "distinct_single_line_comments": 3,
+      "duplicate_comment_lines": 3,
+      "sha256": "c309fdbd999f56b546506bb418b8ee53d2b05ddcd1d1b7b0cacd671c076c8dff"
+    }
+  },
+  "comment_anomalies": [
+    {
+      "comment": "-- This is the main counting step: the degree of each board member fixes the",
+      "base_lines": [
+        7
+      ],
+      "donor_lines": [
+        7
+      ],
+      "output_lines": [
+        19,
+        165
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- number of cross-edges, and the degree bound on each outside member then",
+      "base_lines": [
+        8
+      ],
+      "donor_lines": [
+        8
+      ],
+      "output_lines": [
+        20,
+        166
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    },
+    {
+      "comment": "-- forces it to be adjacent to every other outside member.",
+      "base_lines": [
+        9
+      ],
+      "donor_lines": [
+        9
+      ],
+      "output_lines": [
+        21,
+        167
+      ],
+      "input_maximum_count": 1,
+      "output_count": 2,
+      "excess_count": 1
+    }
+  ],
+  "excess_comment_lines": 3,
+  "worker_sha256": "c360cb1d4b7cda89032763df58f9d7785f16ea06c3eab8ecfb1207d390eac8cd",
+  "toolchain": "leanprover/lean4:v4.26.0"
+}

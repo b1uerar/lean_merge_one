@@ -444,6 +444,78 @@ def headerText (doc : Document) : String :=
   let stop := doc.source.toFileMap.ofPosition (doc.source.crlfToLf.toFileMap.toPosition stop)
   slice doc.source 0 stop
 
+structure CommandSource where
+  leading : String := ""
+  text : String := ""
+  trailing : String := ""
+  deriving Inhabited
+
+structure SourceParts where
+  commands : Array CommandSource := #[]
+  tail : String := ""
+
+-- Gaps come from parser ranges, so they contain only whitespace and comments.
+-- Keep same-line comments with the preceding command, including nested blocks.
+def splitCommandGap (gap : String) : String × String := Id.run do
+  let chars := gap.toList.toArray
+  let mut i := 0
+  let mut depth := 0
+  let mut lineComment := false
+  while i < chars.size do
+    let c := chars[i]!
+    let next := chars[i + 1]?
+    if c == '\n' && depth == 0 then
+      let pos := (String.ofList (chars.toList.take (i + 1))).rawEndPos
+      return (slice gap 0 pos, slice gap pos gap.rawEndPos)
+    if !lineComment && c == '/' && next == some '-' then
+      depth := depth + 1
+      i := i + 2
+    else if !lineComment && depth > 0 && c == '-' && next == some '/' then
+      depth := depth - 1
+      i := i + 2
+    else if depth == 0 && c == '-' && next == some '-' then
+      lineComment := true
+      i := i + 2
+    else i := i + 1
+  return (gap, "")
+
+-- Extract trivia once, before arranging commands. Rendering a command restores
+-- its own comments; deleting or replaying code need not copy the surrounding gap.
+def sourceParts (doc : Document) : IO SourceParts := do
+  let mut parts : SourceParts := {}
+  let mut cursor := (headerText doc).rawEndPos
+  for cmd in doc.commands do
+    let (start, stop) ← bounds doc cmd.stx
+    let gap := slice doc.source cursor start
+    let leading ← if parts.commands.isEmpty then pure gap else do
+      let (trailing, leading) := splitCommandGap gap
+      let commands := parts.commands.modify (parts.commands.size - 1) (fun part => { part with trailing })
+      parts := { parts with commands }
+      pure leading
+    parts := { parts with commands := parts.commands.push {
+      leading, text := slice doc.source start stop } }
+    cursor := stop
+  let gap := slice doc.source cursor doc.source.rawEndPos
+  if parts.commands.isEmpty then return { parts with tail := gap }
+  let (trailing, tail) := splitCommandGap gap
+  let commands := parts.commands.modify (parts.commands.size - 1) (fun part => { part with trailing })
+  return { commands, tail }
+
+-- Extraction can also leave a removed declaration's explanation at EOF.
+-- Keep independent footer text, but not an exact copy of a retained explanation.
+def withoutCopiedTail (base donor : SourceParts) : SourceParts :=
+  let comment := donor.tail.crlfToLf.trim
+  if !comment.isEmpty && base.commands.any (fun part => part.leading.crlfToLf.trim == comment) then
+    { donor with tail := "" }
+  else donor
+
+-- A target inside mutual/`in` also has a gap before its declaration.
+partial def precedingSyntaxEnd (stx : Syntax) (pos : String.Pos.Raw) : String.Pos.Raw :=
+  if let some stop := stx.getTailPos? then
+    if stop ≤ pos then stop
+    else stx.getArgs.foldl (fun acc child => max acc (precedingSyntaxEnd child pos)) 0
+  else 0
+
 def extraImports (base donor : Document) : String := Id.run do
   let mut result := ""
   for imp in donor.header.imports do
@@ -574,37 +646,49 @@ def proofCommand (base donor : Document) (target candidate : Name) : IO String :
   let (oldTheoremStart, _) ← bounds base oldTheorem
   -- Keep the target's documentation and attributes. The proof's binders and body stay intact.
   let modifiers := slice base.source oldStart oldTheoremStart
-  return modifiers.crlfToLf ++ slice donor.source theoremStart idStart ++ name ++
+  -- Retain enclosing commands such as `set_option ... in` outside the declaration modifiers.
+  return slice donor.source start declStart ++ modifiers.crlfToLf ++
+    slice donor.source theoremStart idStart ++ name ++
     slice donor.source idStop stop
 
 def selectedSource (doc : Document) (selected : Std.HashSet Nat)
     (replacement : Option (Nat × String) := none)
-    (skip : NameSet := {}) (mapping : NameMap Name := {}) : IO String := do
+    (skip : NameSet := {}) (mapping : NameMap Name := {})
+    (parts? : Option SourceParts := none) (keepTail : Bool := true) : IO String := do
   let _ : Inhabited Environment := ⟨doc.env⟩
+  let parts ← match parts? with
+    | some parts => pure parts
+    | none => sourceParts doc
   let mut output := ""
-  let mut cursor := (headerText doc).rawEndPos
   for i in [:doc.commands.size] do
     let cmd := doc.commands[i]!
-    let (start, stop) ← bounds doc cmd.stx
+    let part := parts.commands[i]!
     if selected.contains i && !(cmd.names.size > 0 &&
         (cmd.names.all skip.contains || cmd.names.all (fun n => (mapping.find? n).isSome)) &&
         (replacement.map (fun r => r.1 == i) |>.getD false |>.not)) then
       let text := match replacement with
-        | some (owner, text) => if owner == i then text else slice doc.source start stop
-        | none => slice doc.source start stop
-      -- Keep comments adjacent to retained commands, including comments before the first one.
-      output := output ++ slice doc.source cursor start ++ text ++ "\n"
-    cursor := stop
-  return output ++ slice doc.source cursor doc.source.rawEndPos
+        | some (owner, text) => if owner == i then text else part.text
+        | none => part.text
+      output := output ++ part.leading ++ text ++ part.trailing ++ "\n"
+  return output ++ if keepTail then parts.tail else ""
 
 def arrange (base donor : Document) (target candidate : Name) (selection : Selection) : IO String := do
   let _ : Inhabited Environment := ⟨base.env⟩
+  let baseParts ← sourceParts base
+  let donorParts := withoutCopiedTail baseParts (← sourceParts donor)
   let targetOwner := base.owners.get! target
   let replaced := theoremDeclarations base target
   let wholeTarget := base.commands[targetOwner]!.names.all replaced.contains
   let removed ← if wholeTarget then pure base.commands[targetOwner]!.stx else declarationSyntax base target
   let (removeStart, removeStop) ← bounds base removed
   let (ownerStart, ownerStop) ← bounds base base.commands[targetOwner]!.stx
+  let (removeStart, targetLeading) := if wholeTarget then
+      (removeStart, baseParts.commands[targetOwner]!.leading)
+    else Id.run do
+      let parserPos := precedingSyntaxEnd base.commands[targetOwner]!.stx (removed.getPos?.getD 0)
+      let pos := base.source.toFileMap.ofPosition (base.source.crlfToLf.toFileMap.toPosition parserPos)
+      let (trailing, leading) := splitCommandGap (slice base.source pos removeStart)
+      return (⟨pos.byteIdx + trailing.utf8ByteSize⟩, leading)
   let remainingOwner := slice base.source ownerStart removeStart ++ slice base.source removeStop ownerStop
   -- Lift original dependencies together with their original context. Scope delimiters
   -- can be replayed; declarations are removed from their former positions, not copied.
@@ -617,24 +701,46 @@ def arrange (base donor : Document) (target candidate : Name) (selection : Selec
       if let some info := base.env.find? name then
         if info.getUsedConstantsAsSet.toArray.any replaced.contains then
           throw (IO.userError "Source order conflict: a mutual dependency needs the unfinished target")
+  -- Replayed scope/context commands keep their comments at the original position.
+  let dependencyParts := { baseParts with commands := baseParts.commands.mapIdx (fun i part =>
+    if isScopeCommand base.commands[i]!.stx || isContextCommand base.commands[i]!.stx then
+      { part with leading := "", trailing := "\n" }
+    else part) }
   let dependencies ← selectedSource base lifted.selected (some (targetOwner, remainingOwner))
+    (parts? := some dependencyParts) (keepTail := false)
   let replacement ← proofCommand base donor target candidate
   let mapping := nameMapping base donor
-  let proofSource ← selectedSource donor selection.selected (some (donor.owners.get! candidate, replacement)) selection.reused mapping
+  let candidateOwner := donor.owners.get! candidate
+  -- The base owns the target's explanation, just as it owns its docstring and
+  -- attributes. Donor gaps may contain orphan comments left by earlier extraction.
+  let targetComment := targetLeading.crlfToLf.trim
+  let donorLeading := donorParts.commands[candidateOwner]!.leading.crlfToLf
+  let mut proofCommands := donorParts.commands
+  -- A submitted proof may insert a helper under the original target comment.
+  -- Move one exact copy back unless the target gap already supplies that copy.
+  -- Other equal comments, and comments inside proofs, keep their occurrences.
+  if !targetComment.isEmpty && (donorLeading.splitOn targetComment).length == 1 then
+    for i in [:proofCommands.size] do
+      if i != candidateOwner && selection.selected.contains i && !donor.commands[i]!.names.isEmpty &&
+          proofCommands[i]!.leading.crlfToLf.trim == targetComment then
+        proofCommands := proofCommands.modify i (fun part => { part with leading := "\n" })
+        break
+  proofCommands := proofCommands.modify candidateOwner (fun part => { part with leading := targetLeading })
+  let proofParts := { donorParts with commands := proofCommands }
+  let proofSource ← selectedSource donor selection.selected (some (candidateOwner, replacement))
+    selection.reused mapping (some proofParts)
   let mut rest := ""
-  let mut cursor := (headerText base).rawEndPos
   for i in [:base.commands.size] do
     let cmd := base.commands[i]!
-    let (start, stop) ← bounds base cmd.stx
-    rest := rest ++ slice base.source cursor start
+    let part := baseParts.commands[i]!
     if i == targetOwner then
-      if !lifted.selected.contains i then rest := rest ++ remainingOwner
+      if !wholeTarget && !lifted.selected.contains i then
+        rest := rest ++ part.leading ++ remainingOwner ++ part.trailing
     -- Context commands also govern declarations left at their original positions.
     else if lifted.selected.contains i && !isScopeCommand cmd.stx &&
         !isContextCommand cmd.stx then pure ()
-    else rest := rest ++ slice base.source start stop
-    cursor := stop
-  rest := rest ++ slice base.source cursor base.source.rawEndPos
+    else rest := rest ++ part.leading ++ part.text ++ part.trailing
+  rest := rest ++ baseParts.tail
   let dependencies := if lifted.selected.isEmpty then "" else "\nsection\n" ++ dependencies.crlfToLf ++ "\nend\n"
   -- Sections keep submitted variables, local notation and options out of the main file.
   return headerText base ++ sourceNewlines base
@@ -714,7 +820,8 @@ def addedCommands (before after : Document) (target : Option Name := none) : IO 
 
 unsafe def mergeDeclarations (base donor : Document) (req : Request) : IO Json := do
   let selection ← mergeSelection base donor (Array.range donor.commands.size) req
-  let source ← selectedSource donor selection.selected (mapping := nameMapping base donor)
+  let parts := withoutCopiedTail (← sourceParts base) (← sourceParts donor)
+  let source ← selectedSource donor selection.selected (mapping := nameMapping base donor) (parts? := some parts)
   let header := headerText base
   -- Each input starts with its own variables, local notation, options and open namespaces.
   let content := header ++ sourceNewlines base "\nsection\n" ++

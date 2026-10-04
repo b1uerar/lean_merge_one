@@ -48,6 +48,36 @@ class MergeTests(unittest.TestCase):
         self.assertIn("example : 3 + 0 = 3 := N.target 3", result["content"])
         self.assertEqual(len(result["inserted"]), 1)
 
+    def test_nested_proof_options_survive_standalone_compilation(self):
+        shared = "def countdown : Nat → Nat\n  | 0 => 0\n  | n + 1 => countdown n\n"
+        modifiers = "/-- Keep target documentation. -/\n@[simp] "
+        base = shared + modifiers + "theorem target : countdown 1000 = 0 := sorry\n"
+        wrappers = ("set_option maxRecDepth 8192 in\n"
+                    "-- Keep the scoped option comment.\n"
+                    "set_option maxHeartbeats 2000000 in\n")
+        for proof, newline in (("target", "\n"), ("solution", "\r\n")):
+            with self.subTest(proof=proof, newline=newline):
+                donor = (shared + wrappers + "/-- Donor documentation. -/\n"
+                         f"theorem {proof} : countdown 1000 = 0 := by decide\n")
+                result = self.check_merge(
+                    base.replace("\n", newline), donor.replace("\n", newline),
+                    target="target", proof=proof)
+                content = result["content"]
+                # Internal verification uses higher limits than an ordinary Lean invocation.
+                with tempfile.TemporaryDirectory() as directory:
+                    output = Path(directory) / "Merged.lean"
+                    output.write_bytes(content.encode("utf-8"))
+                    compiled = subprocess.run(
+                        ["lean", str(output)], cwd=ROOT, capture_output=True, text=True,
+                        timeout=30)
+                self.assertEqual(compiled.returncode, 0, compiled.stdout + compiled.stderr)
+                name = "target" if proof == "target" else "_root_.target"
+                self.assertIn((wrappers + modifiers + f"theorem {name}").replace("\n", newline),
+                              content)
+                self.assertNotIn("Donor documentation.", content)
+                if newline == "\r\n":
+                    self.assertNotIn("\n", content.replace("\r\n", ""))
+
     def test_universe_binders(self):
         self.check_merge(
             "universe u\ntheorem target {A : Sort u} (a : A) : a = a := sorry\n",
